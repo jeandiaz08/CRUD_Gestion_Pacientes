@@ -1,0 +1,35 @@
+FROM python:3.10-slim
+
+
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+
+RUN apt-get update && apt-get install -y \
+    libaio1 \
+    curl \
+    unzip \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+
+WORKDIR /app
+
+
+COPY . .
+
+
+RUN curl -L -o instantclient.zip "https://www.dropbox.com/scl/fi/llvitf1gtoupt6kvuuusp/instantclient-basic-linux.x64-23.8.0.25.04.zip?rlkey=atfky3qn4pm7tmh8avb07r7zv&dl=1" && \
+    unzip instantclient.zip -d /opt/oracle && \
+    rm instantclient.zip && \
+    ln -s /opt/oracle/instantclient_23_8 /opt/oracle/instantclient
+
+
+ENV LD_LIBRARY_PATH=/opt/oracle/instantclient
+ENV TNS_ADMIN=/app/proyecto_gestor_p/wallet
+
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
+
+
+CMD ["gunicorn", "--bind", "0.0.0.0:10000", "proyecto_gestor_p.wsgi:application"]
