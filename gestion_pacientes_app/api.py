@@ -5,11 +5,18 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from .serializers import DaoPacientes,RegistroMedicoSerializer
+from rest_framework.pagination import PageNumberPagination
+
+class PacientePagination(PageNumberPagination):
+    page_size = 20  # o la cantidad que quieras por página
+    page_size_query_param = 'page_size'
+    max_page_size = 100
 
 class DaoViewSet(viewsets.ModelViewSet):
     queryset = Paciente.objects.all()
     permission_classes = [permissions.AllowAny]
     serializer_class = DaoPacientes
+    pagination_class = PacientePagination
 
 class RegistroMedicoView(APIView):
     def post(self, request):
