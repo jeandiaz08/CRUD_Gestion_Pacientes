@@ -13,7 +13,7 @@ class PacientePagination(PageNumberPagination):
     max_page_size = 100
 
 class DaoViewSet(viewsets.ModelViewSet):
-    queryset = Paciente.objects.all()
+    queryset = queryset = Paciente.objects.all().order_by('id_pac')
     permission_classes = [permissions.AllowAny]
     serializer_class = DaoPacientes
     pagination_class = PacientePagination
