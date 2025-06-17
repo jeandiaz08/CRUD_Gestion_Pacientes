@@ -38,8 +38,14 @@ class DaoViewSet(viewsets.ModelViewSet):
                 cursor.execute("DELETE FROM PLAN_MEDICO WHERE PACIENTE_id_pac = %s AND PACIENTE_MEDICO_id_med = %s", [id_pac, id_med])
                 cursor.execute("DELETE FROM PACI_ESPECIALES WHERE PACIENTE_id_pac = %s AND PACIENTE_MEDICO_id_med = %s", [id_pac, id_med])
                 cursor.execute("DELETE FROM DERIVAC_PACIENTE WHERE PACIENTE_id_pac = %s AND PACIENTE_MEDICO_id_med = %s", [id_pac, id_med])
+                cursor.execute("""
+                    DELETE FROM DOCUMENTO 
+                    WHERE HIST_MEDICO_id_hist IN (
+                        SELECT id_hist FROM HIST_MEDICO 
+                        WHERE PACIENTE_id_pac = %s AND PACIENTE_MEDICO_id_med = %s
+                    )
+                """, [id_pac, id_med])
                 cursor.execute("DELETE FROM HIST_MEDICO WHERE PACIENTE_id_pac = %s AND PACIENTE_MEDICO_id_med = %s", [id_pac, id_med])
-                cursor.execute("DELETE FROM DOCUMENTO WHERE id_paciente = %s", [id_pac])
                 cursor.execute("DELETE FROM PACIENTE WHERE id_pac = %s", [id_pac])
 
             print("Paciente eliminado con éxito")
