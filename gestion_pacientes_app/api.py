@@ -28,6 +28,8 @@ class DaoViewSet(viewsets.ModelViewSet):
             print(f"Eliminando paciente {id_pac} y sus relaciones")
 
             with connection.cursor() as cursor:
+                # Eliminar dependencias en orden correcto
+                cursor.execute("DELETE FROM CITA WHERE HISTORIAL_CITA_id_historial IN (SELECT id_historial FROM HISTORIAL_CITA WHERE PACIENTE_id_pac = %s AND PACIENTE_MEDICO_id_med = %s)", [id_pac, id_med])
                 cursor.execute("DELETE FROM CALIFICACION_CITA WHERE PACIENTE_id_pac = %s AND PACIENTE_MEDICO_id_med = %s", [id_pac, id_med])
                 cursor.execute("DELETE FROM VACUNAS WHERE PACIENTE_id_pac = %s AND PACIENTE_MEDICO_id_med = %s", [id_pac, id_med])
                 cursor.execute("DELETE FROM CONTACTO_URGENCIA WHERE PACIENTE_id_pac = %s AND PACIENTE_MEDICO_id_med = %s", [id_pac, id_med])
@@ -46,6 +48,7 @@ class DaoViewSet(viewsets.ModelViewSet):
         except Exception as e:
             print(f"Error eliminando paciente: {str(e)}")
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
     
 class RegistroMedicoView(APIView):
