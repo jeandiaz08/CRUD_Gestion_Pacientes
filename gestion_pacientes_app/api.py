@@ -13,11 +13,22 @@ class PacientePagination(PageNumberPagination):
     max_page_size = 100
 
 class DaoViewSet(viewsets.ModelViewSet):
-    queryset = queryset = Paciente.objects.all().order_by('id_pac')
-    permission_classes = [permissions.AllowAny]
+    queryset = Paciente.objects.all().order_by('id_pac')
     serializer_class = DaoPacientes
+    permission_classes = [permissions.AllowAny]
     pagination_class = PacientePagination
 
+    def destroy(self, request, *args, **kwargs):
+        paciente = self.get_object()
+
+        # Borrar manualmente relaciones relacionadas antes del paciente
+        paciente.contactos_urgencia.all().delete()
+        paciente.planes_medicos.all().delete()
+        paciente.vacunas.all().delete()
+
+        paciente.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
 class RegistroMedicoView(APIView):
     def post(self, request):
         serializer = RegistroMedicoSerializer(data=request.data)
