@@ -19,15 +19,22 @@ class DaoViewSet(viewsets.ModelViewSet):
     pagination_class = PacientePagination
 
     def destroy(self, request, *args, **kwargs):
-        paciente = self.get_object()
+        try:
+            paciente = self.get_object()
 
-        # Borrar manualmente relaciones relacionadas antes del paciente
-        paciente.contactos_urgencia.all().delete()
-        paciente.planes_medicos.all().delete()
-        paciente.vacunas.all().delete()
+            print(f"Eliminando relaciones de paciente {paciente.id_pac}")
 
-        paciente.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+            paciente.contactos_urgencia.all().delete()
+            paciente.planes_medicos.all().delete()
+            paciente.vacunas.all().delete()
+
+            paciente.delete()
+
+            print("Paciente eliminado con éxito")
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            print(f"Error eliminando paciente: {str(e)}")
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 class RegistroMedicoView(APIView):
     def post(self, request):
