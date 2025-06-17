@@ -46,6 +46,16 @@ class DaoViewSet(viewsets.ModelViewSet):
                     )
                 """, [id_pac, id_med])
                 cursor.execute("""
+                    DELETE FROM RECETA
+                    WHERE CONSULTA_MEDICA_id_cons IN (
+                        SELECT id_cons FROM CONSULTA_MEDICA
+                        WHERE HIST_MEDICO_id_hist IN (
+                            SELECT id_hist FROM HIST_MEDICO
+                            WHERE PACIENTE_id_pac = %s AND PACIENTE_MEDICO_id_med = %s
+                        )
+                    )
+                """, [id_pac, id_med])
+                cursor.execute("""
                     DELETE FROM CONSULTA_MEDICA
                     WHERE HIST_MEDICO_id_hist IN (
                         SELECT id_hist FROM HIST_MEDICO
