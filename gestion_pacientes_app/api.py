@@ -1,4 +1,5 @@
 from .models import Paciente,Medico,GrupoSanguineo,PlanMedico,Vacuna,ContactoUrgencia
+from django.db import connection
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response 
@@ -21,17 +22,28 @@ class DaoViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         try:
             paciente = self.get_object()
+            id_pac = paciente.id_pac
+            id_med = paciente.medico.id_med
 
-            print(f"Eliminando relaciones de paciente {paciente.id_pac}")
+            print(f"Eliminando paciente {id_pac} y sus relaciones")
 
-            paciente.contactos_urgencia.all().delete()
-            paciente.planes_medicos.all().delete()
-            paciente.vacunas.all().delete()
-
-            paciente.delete()
+            with connection.cursor() as cursor:
+                cursor.execute("DELETE FROM CALIFICACION_CITA WHERE PACIENTE_id_pac = :1 AND PACIENTE_MEDICO_id_med = :2", [id_pac, id_med])
+                cursor.execute("DELETE FROM VACUNAS WHERE PACIENTE_id_pac = :1 AND PACIENTE_MEDICO_id_med = :2", [id_pac, id_med])
+                cursor.execute("DELETE FROM CONTACTO_URGENCIA WHERE PACIENTE_id_pac = :1 AND PACIENTE_MEDICO_id_med = :2", [id_pac, id_med])
+                cursor.execute("DELETE FROM HISTORIAL_CITA WHERE PACIENTE_id_pac = :1 AND PACIENTE_MEDICO_id_med = :2", [id_pac, id_med])
+                cursor.execute("DELETE FROM FICHA_PACIENTE WHERE PACIENTE_id_pac = :1 AND PACIENTE_MEDICO_id_med = :2", [id_pac, id_med])
+                cursor.execute("DELETE FROM PLAN_MEDICO WHERE PACIENTE_id_pac = :1 AND PACIENTE_MEDICO_id_med = :2", [id_pac, id_med])
+                cursor.execute("DELETE FROM PACI_ESPECIALES WHERE PACIENTE_id_pac = :1 AND PACIENTE_MEDICO_id_med = :2", [id_pac, id_med])
+                cursor.execute("DELETE FROM DERIVAC_PACIENTE WHERE PACIENTE_id_pac = :1 AND PACIENTE_MEDICO_id_med = :2", [id_pac, id_med])
+                cursor.execute("DELETE FROM HIST_MEDICO WHERE PACIENTE_id_pac = :1 AND PACIENTE_MEDICO_id_med = :2", [id_pac, id_med])
+                cursor.execute("DELETE FROM DOCUMENTO WHERE id_paciente = :1", [id_pac])
+                # Agrega más tablas si encuentras más relacionadas
+                cursor.execute("DELETE FROM PACIENTE WHERE id_pac = :1", [id_pac])
 
             print("Paciente eliminado con éxito")
             return Response(status=status.HTTP_204_NO_CONTENT)
+
         except Exception as e:
             print(f"Error eliminando paciente: {str(e)}")
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
