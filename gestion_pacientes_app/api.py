@@ -62,6 +62,13 @@ class DaoViewSet(viewsets.ModelViewSet):
                         WHERE PACIENTE_id_pac = %s AND PACIENTE_MEDICO_id_med = %s
                     )
                 """, [id_pac, id_med])
+                cursor.execute("""
+                    DELETE FROM EXAMENES
+                    WHERE HIST_MEDICO_id_hist IN (
+                        SELECT id_hist FROM HIST_MEDICO
+                        WHERE PACIENTE_id_pac = %s AND PACIENTE_MEDICO_id_med = %s
+                    )
+                """, [id_pac, id_med])
                 cursor.execute("DELETE FROM HIST_MEDICO WHERE PACIENTE_id_pac = %s AND PACIENTE_MEDICO_id_med = %s", [id_pac, id_med])
                 cursor.execute("DELETE FROM PACIENTE WHERE id_pac = %s", [id_pac])
 
