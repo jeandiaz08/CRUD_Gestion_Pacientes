@@ -28,18 +28,17 @@ class DaoViewSet(viewsets.ModelViewSet):
             print(f"Eliminando paciente {id_pac} y sus relaciones")
 
             with connection.cursor() as cursor:
-                cursor.execute("DELETE FROM CALIFICACION_CITA WHERE PACIENTE_id_pac = :1 AND PACIENTE_MEDICO_id_med = :2", [id_pac, id_med])
-                cursor.execute("DELETE FROM VACUNAS WHERE PACIENTE_id_pac = :1 AND PACIENTE_MEDICO_id_med = :2", [id_pac, id_med])
-                cursor.execute("DELETE FROM CONTACTO_URGENCIA WHERE PACIENTE_id_pac = :1 AND PACIENTE_MEDICO_id_med = :2", [id_pac, id_med])
-                cursor.execute("DELETE FROM HISTORIAL_CITA WHERE PACIENTE_id_pac = :1 AND PACIENTE_MEDICO_id_med = :2", [id_pac, id_med])
-                cursor.execute("DELETE FROM FICHA_PACIENTE WHERE PACIENTE_id_pac = :1 AND PACIENTE_MEDICO_id_med = :2", [id_pac, id_med])
-                cursor.execute("DELETE FROM PLAN_MEDICO WHERE PACIENTE_id_pac = :1 AND PACIENTE_MEDICO_id_med = :2", [id_pac, id_med])
-                cursor.execute("DELETE FROM PACI_ESPECIALES WHERE PACIENTE_id_pac = :1 AND PACIENTE_MEDICO_id_med = :2", [id_pac, id_med])
-                cursor.execute("DELETE FROM DERIVAC_PACIENTE WHERE PACIENTE_id_pac = :1 AND PACIENTE_MEDICO_id_med = :2", [id_pac, id_med])
-                cursor.execute("DELETE FROM HIST_MEDICO WHERE PACIENTE_id_pac = :1 AND PACIENTE_MEDICO_id_med = :2", [id_pac, id_med])
-                cursor.execute("DELETE FROM DOCUMENTO WHERE id_paciente = :1", [id_pac])
-                # Agrega más tablas si encuentras más relacionadas
-                cursor.execute("DELETE FROM PACIENTE WHERE id_pac = :1", [id_pac])
+                cursor.execute("DELETE FROM CALIFICACION_CITA WHERE PACIENTE_id_pac = %s AND PACIENTE_MEDICO_id_med = %s", [id_pac, id_med])
+                cursor.execute("DELETE FROM VACUNAS WHERE PACIENTE_id_pac = %s AND PACIENTE_MEDICO_id_med = %s", [id_pac, id_med])
+                cursor.execute("DELETE FROM CONTACTO_URGENCIA WHERE PACIENTE_id_pac = %s AND PACIENTE_MEDICO_id_med = %s", [id_pac, id_med])
+                cursor.execute("DELETE FROM HISTORIAL_CITA WHERE PACIENTE_id_pac = %s AND PACIENTE_MEDICO_id_med = %s", [id_pac, id_med])
+                cursor.execute("DELETE FROM FICHA_PACIENTE WHERE PACIENTE_id_pac = %s AND PACIENTE_MEDICO_id_med = %s", [id_pac, id_med])
+                cursor.execute("DELETE FROM PLAN_MEDICO WHERE PACIENTE_id_pac = %s AND PACIENTE_MEDICO_id_med = %s", [id_pac, id_med])
+                cursor.execute("DELETE FROM PACI_ESPECIALES WHERE PACIENTE_id_pac = %s AND PACIENTE_MEDICO_id_med = %s", [id_pac, id_med])
+                cursor.execute("DELETE FROM DERIVAC_PACIENTE WHERE PACIENTE_id_pac = %s AND PACIENTE_MEDICO_id_med = %s", [id_pac, id_med])
+                cursor.execute("DELETE FROM HIST_MEDICO WHERE PACIENTE_id_pac = %s AND PACIENTE_MEDICO_id_med = %s", [id_pac, id_med])
+                cursor.execute("DELETE FROM DOCUMENTO WHERE id_paciente = %s", [id_pac])
+                cursor.execute("DELETE FROM PACIENTE WHERE id_pac = %s", [id_pac])
 
             print("Paciente eliminado con éxito")
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -47,6 +46,7 @@ class DaoViewSet(viewsets.ModelViewSet):
         except Exception as e:
             print(f"Error eliminando paciente: {str(e)}")
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     
 class RegistroMedicoView(APIView):
     def post(self, request):
