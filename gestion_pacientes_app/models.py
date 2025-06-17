@@ -7,7 +7,7 @@ class GrupoSanguineo(models.Model):
 
     class Meta:
         db_table = 'GRUPO_SANGUINEO'
-        managed = False
+        managed = True
 
 
 class Medico(models.Model):
@@ -21,7 +21,7 @@ class Medico(models.Model):
 
     class Meta:
         db_table = 'MEDICO'
-        managed = False 
+        managed = True 
 
 
 class Paciente(models.Model):
@@ -41,7 +41,7 @@ class Paciente(models.Model):
     class Meta:
         db_table = 'PACIENTE'
         unique_together = (('medico', 'id_pac'),)
-        managed = False
+        managed = True
 
 
 class PlanMedico(models.Model):
@@ -58,7 +58,7 @@ class PlanMedico(models.Model):
     class Meta:
         db_table = 'PLAN_MEDICO'
         unique_together = (('paciente', 'medico'),)
-        managed = False
+        managed = True
 
 
 class Vacuna(models.Model):
@@ -75,7 +75,7 @@ class Vacuna(models.Model):
     class Meta:
         db_table = 'VACUNAS'
         unique_together = (('paciente', 'medico'),)
-        managed = False
+        managed = True
 
 
 class ContactoUrgencia(models.Model):
