@@ -78,30 +78,36 @@ class RegistroMedicoSerializer(serializers.Serializer):
         medico_id = validated_data['medico']
         vacunas = validated_data['vacunas']
 
-        paciente = Paciente.objects.get(pk=paciente_id)
-        medico = Medico.objects.get(pk=medico_id)
+        try:
+            paciente = Paciente.objects.get(pk=paciente_id)
+            medico = Medico.objects.get(pk=medico_id)
 
-        max_plan = PlanMedico.objects.aggregate(max_id=Max('id_plan'))['max_id'] or 0
-        plan = PlanMedico.objects.create(
-            id_plan=max_plan + 1,
-            nombre=nombre,
-            descripcion_plan=descripcion,
-            paciente=paciente,
-            medico=medico
-        )
-
-        max_vac = Vacuna.objects.aggregate(max_id=Max('id_vancuna'))['max_id'] or 0
-        for i, vacuna_nombre in enumerate(vacunas):
-            Vacuna.objects.create(
-                id_vancuna=max_vac + i + 1,
-                nom_vacuna=vacuna_nombre,
-                descrip_vacuna="",
+            max_plan = PlanMedico.objects.aggregate(max_id=Max('id_plan'))['max_id'] or 0
+            plan = PlanMedico.objects.create(
+                id_plan=max_plan + 1,
+                nombre=nombre,
+                descripcion_plan=descripcion,
                 paciente=paciente,
                 medico=medico
             )
 
-        return {"mensaje": "Plan médico y vacunas guardados correctamente"}
-
+            max_vac = Vacuna.objects.aggregate(max_id=Max('id_vancuna'))['max_id'] or 0
+            for i, vacuna_nombre in enumerate(vacunas):
+                Vacuna.objects.create(
+                    id_vancuna=max_vac + i + 1,
+                    nom_vacuna=vacuna_nombre,
+                    descrip_vacuna="",
+                    paciente=paciente,
+                    medico=medico
+                )
+            return {"mensaje": "Plan médico y vacunas guardados correctamente"}
+        except Paciente.DoesNotExist:
+            raise serializers.ValidationError("El paciente especificado no existe.")
+        except Medico.DoesNotExist:
+            raise serializers.ValidationError("El médico especificado no existe.")
+        except Exception as e:
+            raise serializers.ValidationError(f"Error al crear el plan médico: {str(e)}")
+        
 class DaoGrupoSanguineo(serializers.ModelSerializer):
     class Meta:
         model = GrupoSanguineo
