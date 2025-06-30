@@ -57,7 +57,6 @@ class PlanMedico(models.Model):
 
     class Meta:
         db_table = 'PLAN_MEDICO'
-        unique_together = (('paciente', 'medico'),)
         managed = True
 
 
